@@ -328,6 +328,11 @@ $(foreach sproj,$(sprojs_enabled), \
 deps : $(deps)
 .PHONY : deps
 
+mentry.o: litex_rocket.dtb
+
+litex_rocket.dtb: litex_rocket.dts
+	dtc ../machine/litex_rocket.dts -O dtb -o $@
+
 #-------------------------------------------------------------------------
 # Check
 #-------------------------------------------------------------------------
