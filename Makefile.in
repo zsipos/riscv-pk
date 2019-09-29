@@ -330,8 +330,8 @@ deps : $(deps)
 
 mentry.o: litex_rocket.dtb
 
-litex_rocket.dtb: litex_rocket.dts
-	dtc ../machine/litex_rocket.dts -O dtb -o $@
+litex_rocket.dtb: $(TOP)/gateware/soc/build_$(BOARD)/$(BOARD).dts
+	dtc -I dts $< -O dtb -o $@
 
 #-------------------------------------------------------------------------
 # Check
