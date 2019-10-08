@@ -230,8 +230,8 @@ do_reset:
   li x7, 0
   li x8, 0
   li x9, 0
-  // link to custom DT blob:
-  csrr x10, mhartid
+  // li x10, 0
+  //link to custom DT blob:
   la x11, _dtb
   li x12, 0
   li x13, 0
