@@ -331,7 +331,7 @@ deps : $(deps)
 
 mentry.o: litex_rocket.dtb
 
-litex_rocket.dtb: $(TOP)/gateware/soc/build_$(BOARD)/software/include/generated/devicetree.dts
+litex_rocket.dtb: $(ZTOP)/gateware/soc/build_$(BOARD)/software/include/generated/devicetree.dts
 	dtc -I dts $< -O dtb -o $@
 
 #-------------------------------------------------------------------------
