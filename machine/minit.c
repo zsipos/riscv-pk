@@ -92,7 +92,9 @@ static void fp_init()
 #else
   uintptr_t fd_mask = (1 << ('F' - 'A')) | (1 << ('D' - 'A'));
   clear_csr(misa, fd_mask);
-  assert(!(read_csr(misa) & fd_mask));
+  if (read_csr(misa) & fd_mask) 
+    printm("warning: misa=0x%x\n", read_csr(misa) & fd_mask);
+  //assert(!(read_csr(misa) & fd_mask));
 #endif
 }
 
