@@ -230,9 +230,11 @@ do_reset:
   li x7, 0
   li x8, 0
   li x9, 0
-  // li x10, 0
-  //link to custom DT blob:
-  la x11, _dtb
+  // x10 = hartid, set by bootrom
+  // x11 = devicetree, set by bootrom
+  bnez x11, .Ldtb_passed
+  la x11, _dtb //link to custom DT blob
+.Ldtb_passed:
   li x12, 0
   li x13, 0
   li x14, 0
