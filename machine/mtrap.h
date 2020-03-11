@@ -31,6 +31,7 @@ static inline int xlen()
   return read_const_csr(misa) < 0 ? 64 : 32;
 }
 
+extern uintptr_t mem_base;
 extern uintptr_t mem_size;
 extern volatile uint64_t* mtime;
 extern volatile uint32_t* plic_priorities;

@@ -10,6 +10,7 @@
 #include <string.h>
 
 extern char _payload_start, _payload_end; /* internal payload */
+extern char _sel4_payload_start, _sel4_payload_end; /* internal sel4 payload */
 static const void* entry_point;
 long disabled_hart_mask;
 
@@ -115,12 +116,32 @@ void boot_other_hart(uintptr_t unused __attribute__((unused)))
     }
   }
 
+  //for(;;); /* loop 4 ever */
+
 #ifdef BBL_BOOT_MACHINE
   enter_machine_mode(entry, hartid, dtb_output());
 #else /* Run bbl in supervisor mode */
   protect_memory();
   enter_supervisor_mode(entry, hartid, dtb_output());
 #endif
+}
+
+void do_nothing()
+{
+	for(;;);
+}
+
+void boot_first_hart()
+{
+	uintptr_t sel4_base = mem_base + mem_size - BBL_MEMSIZE_SEL4;
+	size_t    sel4_size = &_sel4_payload_end - &_sel4_payload_start;
+    long hartid = read_csr(mhartid);
+
+	printm("base=%lx, len=%lx\r\n", sel4_base, sel4_size);
+	memcpy((void*)sel4_base, &_sel4_payload_start, sel4_size);
+	protect_memory();
+	//enter_supervisor_mode((void*)do_nothing, hartid, 0);
+	enter_supervisor_mode((void*)sel4_base, hartid, 0);
 }
 
 void boot_loader(uintptr_t dtb)
@@ -135,6 +156,5 @@ void boot_loader(uintptr_t dtb)
   mb();
   /* Use optional FDT preloaded external payload if present */
   entry_point = kernel_start ? kernel_start : &_payload_start;
-  enter_supervisor_mode((void*)test, 0, dtb_output());
-  //boot_other_hart(0);
+  boot_first_hart();
 }
