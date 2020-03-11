@@ -232,9 +232,7 @@ do_reset:
   li x9, 0
   // x10 = hartid, set by bootrom
   // x11 = devicetree, set by bootrom
-  bnez x11, .Ldtb_passed
   la x11, _dtb //link to custom DT blob
-.Ldtb_passed:
   li x12, 0
   li x13, 0
   li x14, 0
@@ -317,7 +315,7 @@ do_reset:
 
 _dtb:
   // include custom DT blob:
-  .incbin "litex_rocket.dtb"
+  .incbin "devicetree.dtb"
 
   .bss
   .align RISCV_PGSHIFT
