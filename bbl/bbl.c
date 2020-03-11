@@ -86,9 +86,19 @@ static void protect_memory(void)
                    [cfg] "r" (cfg));
 }
 
+void test()
+{
+  for(;;) {
+    for (long u = 0; u < 50000000 * 10; u++)
+    	;
+	printm("hi ho from hart 0\r\n");
+  }
+}
+
 void boot_other_hart(uintptr_t unused __attribute__((unused)))
 {
   const void* entry;
+
   do {
     entry = entry_point;
     mb();
@@ -125,5 +135,6 @@ void boot_loader(uintptr_t dtb)
   mb();
   /* Use optional FDT preloaded external payload if present */
   entry_point = kernel_start ? kernel_start : &_payload_start;
-  boot_other_hart(0);
+  enter_supervisor_mode((void*)test, 0, dtb_output());
+  //boot_other_hart(0);
 }
