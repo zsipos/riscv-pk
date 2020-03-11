@@ -592,6 +592,9 @@ subprojects_enabled
 subprojects
 BBL_LOGO_FILE
 BBL_PAYLOAD
+BBL_DEVICETREE
+BBL_PAYLOAD_SEL4
+BBL_SEL4_MEMSIZE
 BBL_ENABLE_LOGO
 MEM_START
 WITH_ABI
@@ -1330,6 +1333,9 @@ Optional Packages:
   --with-abi              Set the RISC-V ABI
   --with-mem-start        Set physical memory start address
   --with-payload          Set ELF payload for bbl
+  --with-devicetree       Set builtin devicetree
+  --with-payload-sel4     Set sel4 payload for bbl
+  --with-sel4-memsize     Set sel4 memory size (taken from top of devicetree memory)
   --with-logo             Specify a better logo
 
 Some influential environment variables:
@@ -4294,6 +4300,29 @@ $as_echo "#define RELAXED_ALIGNMENT 1" >>confdefs.h
 
 fi
 
+# Check whether --with-devicetree was given.
+if test "${with_devicetree+set}" = set; then :
+  withval=$with_devicetree;
+   BBL_DEVICETREE=$with_devicetree
+else
+   BBL_DEVICETREE=dummy_devicetree.dts
+fi
+
+# Check whether --with-payload-sel4 was given.
+if test "${with_payload_sel4+set}" = set; then :
+  withval=$with_payload_sel4;
+   BBL_PAYLOAD_SEL4=$with_payload_sel4
+else
+   BBL_PAYLOAD_SEL4=dummy_payload
+fi
+
+# Check whether --with-sel4-memsize was given.
+if test "${with_sel4_memsize+set}" = set; then :
+  withval=$with_sel4_memsize
+   BBL_SEL4_MEMSIZE=$with_sel4_memsize
+else
+   BBL_SEL4_MEMSIZE=0x2000000
+fi
 
 
 # Check whether --with-logo was given.
