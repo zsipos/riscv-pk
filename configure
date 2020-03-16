@@ -593,7 +593,7 @@ subprojects
 BBL_LOGO_FILE
 BBL_PAYLOAD
 BBL_DEVICETREE
-BBL_PAYLOAD_SEL4
+BBL_PAYLOAD2
 BBL_MEMSIZE_SEL4
 BBL_ENABLE_LOGO
 MEM_START
@@ -1334,8 +1334,8 @@ Optional Packages:
   --with-mem-start        Set physical memory start address
   --with-payload          Set ELF payload for bbl
   --with-devicetree       Set builtin devicetree
-  --with-payload-sel4     Set sel4 payload for bbl
-  --with-memsize-sel4     Set sel4 memory size (taken from top of devicetree memory)
+  --with-payload2         Set 2. ELF payload for bbl
+  --with-memsize-sel4     Set memory size for sel4 (= first) payload
   --with-logo             Specify a better logo
 
 Some influential environment variables:
@@ -4309,11 +4309,11 @@ else
 fi
 
 # Check whether --with-payload-sel4 was given.
-if test "${with_payload_sel4+set}" = set; then :
-  withval=$with_payload_sel4;
-   BBL_PAYLOAD_SEL4=$with_payload_sel4
+if test "${with_payload2+set}" = set; then :
+  withval=$with_payload2;
+   BBL_PAYLOAD2=$with_payload2
 else
-   BBL_PAYLOAD_SEL4=dummy_payload
+   BBL_PAYLOAD2=dummy_payload
 fi
 
 # Check whether --with-memsize-sel4 was given.

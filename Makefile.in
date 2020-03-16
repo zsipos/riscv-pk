@@ -111,13 +111,13 @@ VPATH := $(addprefix $(src_dir)/, $(sprojs_enabled))
 CC            := @CC@
 READELF       := @READELF@
 OBJCOPY       := @OBJCOPY@
-CFLAGS        := @CFLAGS@ $(CFLAGS) $(march) $(mabi)  -DBBL_MEMSIZE_SEL4=@BBL_MEMSIZE_SEL4@ -DBBL_PAYLOAD=\"bbl_payload\" -DBBL_PAYLOAD_SEL4=\"bbl_payload_sel4\" -DBBL_LOGO_FILE=\"bbl_logo_file\" -fno-stack-protector -U_FORTIFY_SOURCE
+CFLAGS        := @CFLAGS@ $(CFLAGS) $(march) $(mabi)  -DBBL_MEMSIZE_SEL4=@BBL_MEMSIZE_SEL4@ -DBBL_PAYLOAD=\"bbl_payload\" -DBBL_PAYLOAD2=\"bbl_payload2\" -DBBL_LOGO_FILE=\"bbl_logo_file\" -fno-stack-protector -U_FORTIFY_SOURCE
 BBL_PAYLOAD   := @BBL_PAYLOAD@
 COMPILE       := $(CC) -MMD -MP $(CFLAGS) \
                  $(sprojs_include)
 
-BBL_DEVICETREE   := @BBL_DEVICETREE@
-BBL_PAYLOAD_SEL4 := @BBL_PAYLOAD_SEL4@
+BBL_DEVICETREE := @BBL_DEVICETREE@
+BBL_PAYLOAD2   := @BBL_PAYLOAD2@
 
 # Linker
 #  - LDFLAGS : Flags for the linker (eg. -L)

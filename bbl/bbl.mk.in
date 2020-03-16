@@ -16,12 +16,12 @@ bbl_asm_srcs = \
   payload.S \
   raw_logo.S \
 
-payload.o: bbl_payload bbl_payload_sel4
+payload.o: bbl_payload bbl_payload2
 
 bbl_payload: $(BBL_PAYLOAD)
 	if $(READELF) -h $< 2> /dev/null > /dev/null; then $(OBJCOPY) -O binary --set-section-flags .bss=alloc,load,contents $< $@; else cp $< $@; fi
 
-bbl_payload_sel4: $(BBL_PAYLOAD_SEL4)
+bbl_payload2: $(BBL_PAYLOAD2)
 	if $(READELF) -h $< 2> /dev/null > /dev/null; then $(OBJCOPY) -O binary --set-section-flags .bss=alloc,load,contents $< $@; else cp $< $@; fi
 
 raw_logo.o: bbl_logo_file

@@ -15,7 +15,6 @@
 #include <limits.h>
 
 pte_t* root_page_table;
-uintptr_t mem_base;
 uintptr_t mem_size;
 volatile uint64_t* mtime;
 volatile uint32_t* plic_priorities;

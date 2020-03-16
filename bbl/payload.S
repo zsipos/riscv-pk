@@ -21,8 +21,8 @@ _payload_end:
   /* this gets copied later */
   .align 3
 
-  .globl _sel4_payload_start, _sel4_payload_end
-_sel4_payload_start:
-  .incbin BBL_PAYLOAD_SEL4
-_sel4_payload_end:
+  .globl _payload2_start, _payload2_end
+_payload2_start:
+  .incbin BBL_PAYLOAD2
+_payload2_end:
 

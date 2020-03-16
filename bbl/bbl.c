@@ -10,9 +10,12 @@
 #include <string.h>
 
 extern char _payload_start, _payload_end; /* internal payload */
-extern char _sel4_payload_start, _sel4_payload_end; /* internal sel4 payload */
 static const void* entry_point;
 long disabled_hart_mask;
+
+extern char _payload2_start, _payload2_end; /* second internal payload */
+static uintptr_t payload2_base;
+static uintptr_t payload2_size;
 
 static uintptr_t dtb_output()
 {
@@ -24,7 +27,7 @@ static uintptr_t dtb_output()
    * address. The kernel's virtual mapping begins at its load address,
    * thus mandating device-tree is in physical memory after the kernel.
    */
-  uintptr_t end = kernel_end ? (uintptr_t)kernel_end : (uintptr_t)&_payload_end;
+  uintptr_t end = payload2_base + payload2_size;
   return (end + MEGAPAGE_SIZE - 1) / MEGAPAGE_SIZE * MEGAPAGE_SIZE;
 }
 
@@ -96,6 +99,11 @@ void test()
   }
 }
 
+static void do_nothing()
+{
+	for(;;);
+}
+
 void boot_other_hart(uintptr_t unused __attribute__((unused)))
 {
   const void* entry;
@@ -116,36 +124,25 @@ void boot_other_hart(uintptr_t unused __attribute__((unused)))
     }
   }
 
-  //for(;;); /* loop 4 ever */
+  printm("starting second payload at 0x%lx..\r\n", entry);
 
 #ifdef BBL_BOOT_MACHINE
   enter_machine_mode(entry, hartid, dtb_output());
 #else /* Run bbl in supervisor mode */
   protect_memory();
+  //enter_supervisor_mode((void*)do_nothing, dtb_output());
   enter_supervisor_mode(entry, hartid, dtb_output());
 #endif
 }
 
-void do_nothing()
-{
-	for(;;);
-}
-
-void boot_first_hart()
-{
-	uintptr_t sel4_base = mem_base + mem_size - BBL_MEMSIZE_SEL4;
-	size_t    sel4_size = &_sel4_payload_end - &_sel4_payload_start;
-    long hartid = read_csr(mhartid);
-
-	printm("base=%lx, len=%lx\r\n", sel4_base, sel4_size);
-	memcpy((void*)sel4_base, &_sel4_payload_start, sel4_size);
-	protect_memory();
-	//enter_supervisor_mode((void*)do_nothing, hartid, 0);
-	enter_supervisor_mode((void*)sel4_base, hartid, 0);
-}
-
 void boot_loader(uintptr_t dtb)
 {
+  if (kernel_start)
+    die("kernel_start in devicetree not supported!\n");
+  payload2_base = 0x80000000 + BBL_MEMSIZE_SEL4;
+  payload2_size = &_payload2_end - &_payload2_start;
+  memcpy((void*)payload2_base, &_payload2_start, payload2_size);
+  printm("base=%lx size=%d, mem_size=%lx", payload2_base, payload2_size, mem_size);
   filter_dtb(dtb);
 #ifdef PK_ENABLE_LOGO
   print_logo();
@@ -154,7 +151,8 @@ void boot_loader(uintptr_t dtb)
   fdt_print(dtb_output());
 #endif
   mb();
-  /* Use optional FDT preloaded external payload if present */
-  entry_point = kernel_start ? kernel_start : &_payload_start;
-  boot_first_hart();
+  entry_point = (void*)payload2_base;
+  protect_memory();
+  //enter_supervisor_mode((void*)do_nothing, 0, 0);
+  enter_supervisor_mode((void*)&_payload_start, 0, 0);
 }
