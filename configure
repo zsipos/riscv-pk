@@ -594,7 +594,7 @@ BBL_LOGO_FILE
 BBL_PAYLOAD
 BBL_DEVICETREE
 BBL_PAYLOAD2
-BBL_MEMSIZE_SEL4
+BBL_SEL4_MEMSIZE
 BBL_ENABLE_LOGO
 MEM_START
 WITH_ABI
@@ -686,6 +686,10 @@ with_payload
 with_logo
 enable_boot_machine
 enable_fp_emulation
+with_sel4_payload
+with_sel4_memsize
+with_devicetree
+with_linux_payload
 '
       ac_precious_vars='build_alias
 host_alias
@@ -1333,10 +1337,11 @@ Optional Packages:
   --with-abi              Set the RISC-V ABI
   --with-mem-start        Set physical memory start address
   --with-payload          Set ELF payload for bbl
-  --with-devicetree       Set builtin devicetree
-  --with-payload2         Set 2. ELF payload for bbl
-  --with-memsize-sel4     Set memory size for sel4 (= first) payload
   --with-logo             Specify a better logo
+  --with-sel4-payload     Set sel4 payload for bbl. (Alternate for --with-payload)
+  --with-sel4-memsize     Set memory size for sel4 payload
+  --with-linux-payload    Set linux payload for bbl
+  --with-devicetree       Set builtin devicetree
 
 Some influential environment variables:
   CC          C compiler command
@@ -4300,31 +4305,6 @@ $as_echo "#define RELAXED_ALIGNMENT 1" >>confdefs.h
 
 fi
 
-# Check whether --with-devicetree was given.
-if test "${with_devicetree+set}" = set; then :
-  withval=$with_devicetree;
-   BBL_DEVICETREE=$with_devicetree
-else
-   BBL_DEVICETREE=dummy_devicetree.dts
-fi
-
-# Check whether --with-payload-sel4 was given.
-if test "${with_payload2+set}" = set; then :
-  withval=$with_payload2;
-   BBL_PAYLOAD2=$with_payload2
-else
-   BBL_PAYLOAD2=dummy_payload
-fi
-
-# Check whether --with-memsize-sel4 was given.
-if test "${with_memsize_sel4+set}" = set; then :
-  withval=$with_memsize_sel4
-   BBL_MEMSIZE_SEL4=$with_memsize_sel4
-else
-   BBL_MEMSIZE_SEL4=0x8000000
-fi
-
-
 # Check whether --with-logo was given.
 if test "${with_logo+set}" = set; then :
   withval=$with_logo; BBL_LOGO_FILE=$with_logo
@@ -4348,6 +4328,36 @@ $as_echo "#define BBL_BOOT_MACHINE /**/" >>confdefs.h
 
 fi
 
+# Check whether --with-sel4-payload was given.
+if test "${with_sel4_payload+set}" = set; then :
+  withval=$with_sel4_payload;
+  BBL_PAYLOAD=$with_sel4_payload
+  $as_echo "#define RELAXED_ALIGNMENT 0" >>confdefs.h
+fi
+
+# Check whether --with-sel4-memsize was given.
+if test "${with_sel4_memsize+set}" = set; then :
+  withval=$with_sel4_memsize
+  BBL_SEL4_MEMSIZE=$with_sel4_memsize
+else
+  BBL_SEL4_MEMSIZE=0x8000000
+fi
+
+# Check whether --with-linux-payload was given.
+if test "${with_linux_payload+set}" = set; then :
+  withval=$with_linux_payload;
+  BBL_PAYLOAD2=$with_linux_payload
+else
+  BBL_PAYLOAD2=dummy_payload
+fi
+
+# Check whether --with-devicetree was given.
+if test "${with_devicetree+set}" = set; then :
+  withval=$with_devicetree;
+  BBL_DEVICETREE=$with_devicetree
+else
+  BBL_DEVICETREE=dummy_devicetree.dts
+fi
 
 
 

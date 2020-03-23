@@ -111,7 +111,7 @@ VPATH := $(addprefix $(src_dir)/, $(sprojs_enabled))
 CC            := @CC@
 READELF       := @READELF@
 OBJCOPY       := @OBJCOPY@
-CFLAGS        := @CFLAGS@ $(CFLAGS) $(march) $(mabi)  -DBBL_MEMSIZE_SEL4=@BBL_MEMSIZE_SEL4@ -DBBL_PAYLOAD=\"bbl_payload\" -DBBL_PAYLOAD2=\"bbl_payload2\" -DBBL_LOGO_FILE=\"bbl_logo_file\" -fno-stack-protector -U_FORTIFY_SOURCE
+CFLAGS        := @CFLAGS@ $(CFLAGS) $(march) $(mabi) -DBBL_MEM_START=@MEM_START@ -DBBL_SEL4_MEMSIZE=@BBL_SEL4_MEMSIZE@ -DBBL_PAYLOAD=\"bbl_payload\" -DBBL_PAYLOAD2=\"bbl_payload2\" -DBBL_LOGO_FILE=\"bbl_logo_file\" -fno-stack-protector -U_FORTIFY_SOURCE
 BBL_PAYLOAD   := @BBL_PAYLOAD@
 COMPILE       := $(CC) -MMD -MP $(CFLAGS) \
                  $(sprojs_include)

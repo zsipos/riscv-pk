@@ -183,7 +183,7 @@ static void mem_done(const struct fdt_scan_node *node, void *extra)
     uint64_t base, size;
     value = fdt_get_address(node->parent, value, &base);
     value = fdt_get_size   (node->parent, value, &size);
-    if ((base - BBL_MEMSIZE_SEL4) <= self && self <= base + size) { mem_size = size; }
+    if ((base - BBL_SEL4_MEMSIZE) <= self && self <= base + size) { mem_size = size; }
   }
   assert (end == value);
 }
