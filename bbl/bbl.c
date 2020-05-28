@@ -181,6 +181,9 @@ void boot_other_hart(uintptr_t unused __attribute__((unused)))
     }
   }
 
+  //TODO: should be notified after sel4 start. for now just delay the startup.
+  for (int i = 0; i < 2000000; i++) printm("");
+
   printm("starting linux payload at 0x%lx..\r\n", entry);
 
 #ifdef BBL_BOOT_MACHINE
