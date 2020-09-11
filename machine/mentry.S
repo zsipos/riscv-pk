@@ -232,7 +232,17 @@ do_reset:
   li x9, 0
   // x10 = hartid, set by bootrom
   // x11 = devicetree, set by bootrom
-  la x11, _dtb //link to custom DT blob
+
+  // zsipos modification:
+  //
+  // save bootrom dtb
+  .comm bootrom_dtb, 8, 8
+  la x13, bootrom_dtb
+  STORE x11, 0(x13)
+  // use builtin dtb
+  la x11, _dtb
+  //
+
   li x12, 0
   li x13, 0
   li x14, 0

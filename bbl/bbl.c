@@ -12,6 +12,8 @@
 #include "fdt.h"
 #include <string.h>
 
+extern uintptr_t bootrom_dtb;
+
 extern char _payload_start, _payload_end; /* internal payload */
 static const void* entry_point;
 long disabled_hart_mask;
@@ -41,6 +43,15 @@ static void filter_dtb(uintptr_t source)
   uintptr_t dest = dtb_output();
   uint32_t size = fdt_size(source);
   memcpy((void*)dest, (void*)source, size);
+
+  // query boot partition from bootrom dtb
+  printm("bootrom dtb: %lx\r\n", bootrom_dtb);
+  if (!bootrom_dtb)
+	  bootrom_dtb = dest;
+  query_chosen(bootrom_dtb);
+  printm("kernel partition: %d\r\n", kernel_partition);
+  // set partition to fdt
+  set_partition(dest);
 
   // Remove information from the chained FDT
   filter_harts(dest, &disabled_hart_mask);
