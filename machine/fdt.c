@@ -561,7 +561,8 @@ struct chosen_scan {
   const struct fdt_scan_node *chosen;
   void* kernel_start;
   void* kernel_end;
-  uint32_t partition;
+  char* partition;
+  char* boot_version;
 };
 
 static void chosen_open(const struct fdt_scan_node *node, void *extra)
@@ -592,8 +593,10 @@ static void chosen_prop(const struct fdt_scan_prop *prop, void *extra)
   } else if (!strcmp(prop->name, "riscv,kernel-end")) {
     fdt_get_address(prop->node->parent, prop->value, &val);
     scan->kernel_end = (void*)(uintptr_t)val;
-  } else if (!strcmp(prop->name, "partition")) {
-	  scan->partition = fdt_get_value(prop, 0);
+  } else if (!strcmp(prop->name, "zsipos,partition")) {
+	  scan->partition = (char*)prop->value;
+  } else if (!strcmp(prop->name, "zsipos,boot-version")) {
+	  scan->boot_version = (char*)prop->value;
   }
 }
 
@@ -613,7 +616,8 @@ void query_chosen(uintptr_t fdt)
   fdt_scan(fdt, &cb);
   kernel_start = chosen.kernel_start;
   kernel_end = chosen.kernel_end;
-  kernel_partition = chosen.partition;
+  zsipos_partition = chosen.partition;
+  zsipos_boot_version = chosen.boot_version;
 }
 
 //////////////////////////////////////////// HART FILTER ////////////////////////////////////////
@@ -700,25 +704,37 @@ void filter_harts(uintptr_t fdt, long *disabled_hart_mask)
 
 //////////////////////////////////////////// SET PARTITION ////////////////////////////////////////
 
-static void set_partition_prop(const struct fdt_scan_prop *prop, void *extra)
+static void set_string_prop(const struct fdt_scan_prop *prop, char *value)
+{
+	if (strlen(value) >= prop->len) {
+		printm("ERROR: value %s too big for property %s\r\n", value, prop->name);
+		return;
+	}
+	memset(prop->value, ' ', prop->len);
+	strcpy((char*)prop->value, value);
+}
+
+static void _set_bootloader_props(const struct fdt_scan_prop *prop, void *extra)
 {
   struct chosen_scan *scan = (struct chosen_scan *)extra;
   uint64_t val;
   if (!scan->chosen) return;
-  if (!strcmp(prop->name, "partition")) {
-	  *prop->value = kernel_partition;
+  if (!strcmp(prop->name, "zsipos,partition")) {
+	  set_string_prop(prop, zsipos_partition);
+  } else if (!strcmp(prop->name, "zsipos,boot-version")) {
+	  set_string_prop(prop, zsipos_boot_version);
   }
 }
 
-void set_partition(uintptr_t fdt)
+void set_bootloader_props(uintptr_t fdt)
 {
   struct fdt_cb cb;
   struct chosen_scan chosen;
 
   memset(&cb, 0, sizeof(cb));
-  cb.open = chosen_open;
+  cb.open  = chosen_open;
   cb.close = chosen_close;
-  cb.prop = set_partition_prop;
+  cb.prop  = _set_bootloader_props;
 
   memset(&chosen, 0, sizeof(chosen));
   cb.extra = &chosen;

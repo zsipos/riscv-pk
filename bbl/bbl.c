@@ -46,12 +46,18 @@ static void filter_dtb(uintptr_t source)
 
   // query boot partition from bootrom dtb
   printm("bootrom dtb: %lx\r\n", bootrom_dtb);
-  if (!bootrom_dtb)
+  if (!bootrom_dtb) {
+	  printm("no bootrom dtb passed. using defaults.\r\n");
 	  bootrom_dtb = dest;
-  query_chosen(bootrom_dtb);
-  printm("kernel partition: %d\r\n", kernel_partition);
-  // set partition to fdt
-  set_partition(dest);
+	  zsipos_partition = "1";
+	  zsipos_boot_version = "unknown";
+  } else {
+	  query_chosen(bootrom_dtb);
+  }
+  printm("zsipos,partition: %s\r\n", zsipos_partition);
+  printm("zsipos,boot-version: %s\r\n", zsipos_boot_version);
+  // set bootloader infos
+  set_bootloader_props(dest);
 
   // Remove information from the chained FDT
   filter_harts(dest, &disabled_hart_mask);

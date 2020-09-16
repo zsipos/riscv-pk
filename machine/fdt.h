@@ -69,8 +69,8 @@ void filter_harts(uintptr_t fdt, long *disabled_hart_mask);
 void filter_plic(uintptr_t fdt);
 void filter_compat(uintptr_t fdt, const char *compat);
 
-// set kernel_partition to fdt
-void set_partition(uintptr_t fdt);
+// set bootloader information
+void set_bootloader_props(uintptr_t fdt);
 
 // The hartids of available harts
 extern uint64_t hart_mask;
@@ -80,7 +80,8 @@ extern void* kernel_start;
 extern void* kernel_end;
 
 // kernel partition from chosen
-extern uint32_t kernel_partition;
+extern char* zsipos_partition;
+extern char* zsipos_boot_version;
 
 #ifdef PK_PRINT_DEVICE_TREE
 // Prints the device tree to the console as a DTS

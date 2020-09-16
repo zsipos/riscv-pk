@@ -21,7 +21,9 @@ volatile uint32_t* plic_priorities;
 size_t plic_ndevs;
 void* kernel_start;
 void* kernel_end;
-uint32_t kernel_partition;
+
+char* zsipos_partition;
+char* zsipos_boot_version;
 
 static void mstatus_init()
 {
