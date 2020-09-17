@@ -44,6 +44,7 @@ static void filter_dtb(uintptr_t source)
   uint32_t size = fdt_size(source);
   memcpy((void*)dest, (void*)source, size);
 
+#ifdef BBL_IS_SECOND_STAGE
   // query boot partition from bootrom dtb
   printm("bootrom dtb: %lx\r\n", bootrom_dtb);
   if (!bootrom_dtb) {
@@ -58,6 +59,9 @@ static void filter_dtb(uintptr_t source)
   printm("zsipos,boot-version: %s\r\n", zsipos_boot_version);
   // set bootloader infos
   set_bootloader_props(dest);
+#else
+  printm("boot without u-boot..\n");
+#endif
 
   // Remove information from the chained FDT
   filter_harts(dest, &disabled_hart_mask);
