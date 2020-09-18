@@ -44,7 +44,10 @@ static void filter_dtb(uintptr_t source)
   uint32_t size = fdt_size(source);
   memcpy((void*)dest, (void*)source, size);
 
-#ifdef BBL_IS_SECOND_STAGE
+#ifndef BBL_IS_SECOND_STAGE
+  printm("boot without u-boot..\n");
+  bootrom_dtb = 0;
+#endif
   // query boot partition from bootrom dtb
   printm("bootrom dtb: %lx\r\n", bootrom_dtb);
   if (!bootrom_dtb) {
@@ -59,9 +62,6 @@ static void filter_dtb(uintptr_t source)
   printm("zsipos,boot-version: %s\r\n", zsipos_boot_version);
   // set bootloader infos
   set_bootloader_props(dest);
-#else
-  printm("boot without u-boot..\n");
-#endif
 
   // Remove information from the chained FDT
   filter_harts(dest, &disabled_hart_mask);
@@ -203,7 +203,7 @@ void boot_other_hart(uintptr_t unused __attribute__((unused)))
   }
 
   //TODO: should be notified after sel4 start. for now just delay the startup.
-  for (int i = 0; i < 10000000; i++) printm("");
+  for (int i = 0; i < 11000000; i++) printm("");
 
   printm("starting linux payload at 0x%lx..\r\n", entry);
 
