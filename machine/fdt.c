@@ -706,12 +706,15 @@ void filter_harts(uintptr_t fdt, long *disabled_hart_mask)
 
 static void set_string_prop(const struct fdt_scan_prop *prop, char *value)
 {
+	int i;
+
 	if (strlen(value) >= prop->len) {
 		printm("ERROR: value %s too big for property %s\r\n", value, prop->name);
 		return;
 	}
-	memset(prop->value, ' ', prop->len);
 	strcpy((char*)prop->value, value);
+	for (i = strlen(value); i < prop->len; i++)
+		((char*)prop->value)[i] = ' ';
 }
 
 static void _set_bootloader_props(const struct fdt_scan_prop *prop, void *extra)
