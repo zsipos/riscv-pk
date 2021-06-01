@@ -5,7 +5,7 @@
 
 #include <stdint.h>
 
-extern volatile unsigned long *uart_lr;
+extern volatile void *uart_lr;
 
 void uart_lr_putchar(uint8_t ch);
 int uart_lr_getchar();

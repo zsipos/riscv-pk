@@ -3,28 +3,32 @@
 #include <string.h>
 #include "uart_lr.h"
 #include "fdt.h"
+#include "csroffsets.h"
 
-volatile unsigned long *uart_lr;
+volatile void *uart_lr;
 
-#define UART_REG_RXTX       0
-#define UART_REG_TXFULL     1
-#define UART_REG_RXEMPTY    2
-#define UART_REG_EV_STATUS  3
-#define UART_REG_EV_PENDING 4
-#define UART_REG_EV_ENABLE  5
+static inline uint8_t reg_read(unsigned int reg) 
+{
+	return *((volatile uint32_t*)(uart_lr+reg));
+}
+
+static inline void reg_write(unsigned int reg, uint8_t val)
+{
+	*((volatile uint32_t*)(uart_lr+reg)) = val;
+}
 
 void uart_lr_putchar(uint8_t c)
 {
-    while ((uart_lr[UART_REG_TXFULL] & 0x01)); // wait while tx-buffer full
-    uart_lr[UART_REG_RXTX] = c;
+    while ((reg_read(LITEX_UART_TXFULL_REG) & 0x01)); // wait while tx-buffer full
+    reg_write(LITEX_UART_RXTX_REG, c);
 }
 
 int uart_lr_getchar()
 {
     int c = -1;
-    if (!(uart_lr[UART_REG_RXEMPTY] & 0x01)) { // if rx-buffer not empty
-        c = uart_lr[UART_REG_RXTX];
-        uart_lr[UART_REG_EV_PENDING] = 0x02; // ack (UART_EV_RX)
+    if (!(reg_read(LITEX_UART_RXEMPTY_REG) & 0x01)) { // if rx-buffer not empty
+        c = reg_read(LITEX_UART_RXTX_REG);
+        reg_write(LITEX_UART_EV_PENDING_REG, 0x02); // ack 
     }
     return c;
 }
@@ -59,7 +63,7 @@ static void uart_lr_done(const struct fdt_scan_node *node, void *extra)
         return;
 
     // Initialize LiteX UART
-    uart_lr = (void *)(uintptr_t)scan->reg;
+    uart_lr = (void *)scan->reg;
     // FIXME: the BIOS already initialized the registers, should we re-init?
 }
 
