@@ -24,6 +24,7 @@ void* kernel_end;
 
 char* zsipos_partition;
 char* zsipos_boot_version;
+uint32_t zsipos_rotate;
 
 static void mstatus_init()
 {
@@ -194,6 +195,7 @@ void init_first_hart(uintptr_t hartid, uintptr_t dtb)
   query_clint(dtb);
   query_plic(dtb);
   query_chosen(dtb);
+  query_rotate(dtb);
 
   wake_harts();
 

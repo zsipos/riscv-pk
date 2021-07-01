@@ -55,8 +55,10 @@ static void filter_dtb(uintptr_t source)
 	  bootrom_dtb = dest;
 	  zsipos_partition = "1";
 	  zsipos_boot_version = "unknown";
+	  zsipos_rotate = 90;
   } else {
 	  query_chosen(bootrom_dtb);
+	  query_rotate(bootrom_dtb);
   }
   printm("zsipos,partition: %s\r\n", zsipos_partition);
   printm("zsipos,boot-version: %s\r\n", zsipos_boot_version);

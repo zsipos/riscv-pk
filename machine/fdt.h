@@ -63,6 +63,7 @@ void query_harts(uintptr_t fdt);
 void query_plic(uintptr_t fdt);
 void query_clint(uintptr_t fdt);
 void query_chosen(uintptr_t fdt);
+void query_rotate(uintptr_t fdt);
 
 // Remove information from FDT
 void filter_harts(uintptr_t fdt, long *disabled_hart_mask);
@@ -82,6 +83,8 @@ extern void* kernel_end;
 // kernel partition from chosen
 extern char* zsipos_partition;
 extern char* zsipos_boot_version;
+// display rotation
+extern uint32_t zsipos_rotate;
 
 #ifdef PK_PRINT_DEVICE_TREE
 // Prints the device tree to the console as a DTS

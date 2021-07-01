@@ -620,6 +620,56 @@ void query_chosen(uintptr_t fdt)
   zsipos_boot_version = chosen.boot_version;
 }
 
+//////////////////////////////////////////// ROTATE SCAN ////////////////////////////////////////
+
+struct rotate_scan {
+  const struct fdt_scan_node *rotate;
+  uint32_t rotate_value;
+};
+
+static void rotate_open(const struct fdt_scan_node *node, void *extra)
+{
+  struct rotate_scan *scan = (struct rotate_scan *)extra;
+  if (!strcmp(node->name, "ws35a_display@0")) {
+    scan->rotate = node;
+  }
+}
+
+static int rotate_close(const struct fdt_scan_node *node, void *extra)
+{
+  struct rotate_scan *scan = (struct rotate_scan *)extra;
+  if (scan->rotate && scan->rotate == node) {
+    scan->rotate = NULL;
+  }
+  return 0;
+}
+
+static void rotate_prop(const struct fdt_scan_prop *prop, void *extra)
+{
+  struct rotate_scan *scan = (struct rotate_scan *)extra;
+  if (!scan->rotate) return;
+  if (!strcmp(prop->name, "rotate")) {
+    scan->rotate_value = bswap(*prop->value);
+  }
+}
+
+void query_rotate(uintptr_t fdt)
+{
+  struct fdt_cb cb;
+  struct rotate_scan rotate;
+
+  memset(&cb, 0, sizeof(cb));
+  cb.open = rotate_open;
+  cb.close = rotate_close;
+  cb.prop = rotate_prop;
+
+  memset(&rotate, 0, sizeof(rotate));
+  cb.extra = &rotate;
+
+  fdt_scan(fdt, &cb);
+  zsipos_rotate = rotate.rotate_value;
+}
+
 //////////////////////////////////////////// HART FILTER ////////////////////////////////////////
 
 struct hart_filter {
@@ -717,7 +767,7 @@ static void set_string_prop(const struct fdt_scan_prop *prop, char *value)
 		((char*)prop->value)[i] = ' ';
 }
 
-static void _set_bootloader_props(const struct fdt_scan_prop *prop, void *extra)
+static void _set_bootloader_props_chosen(const struct fdt_scan_prop *prop, void *extra)
 {
   struct chosen_scan *scan = (struct chosen_scan *)extra;
   uint64_t val;
@@ -729,18 +779,40 @@ static void _set_bootloader_props(const struct fdt_scan_prop *prop, void *extra)
   }
 }
 
+static void _set_bootloader_props_rotate(const struct fdt_scan_prop *prop, void *extra)
+{
+  struct rotate_scan *scan = (struct rotate_scan *)extra;
+  if (!scan->rotate) return;
+  if (!strcmp(prop->name, "rotate")) {
+	  *prop->value = bswap(zsipos_rotate);
+  }
+}
+
 void set_bootloader_props(uintptr_t fdt)
 {
   struct fdt_cb cb;
   struct chosen_scan chosen;
+  struct rotate_scan rotate;
 
+  // chosen
   memset(&cb, 0, sizeof(cb));
   cb.open  = chosen_open;
   cb.close = chosen_close;
-  cb.prop  = _set_bootloader_props;
+  cb.prop  = _set_bootloader_props_chosen;
 
   memset(&chosen, 0, sizeof(chosen));
   cb.extra = &chosen;
+
+  fdt_scan(fdt, &cb);
+
+  // rotate
+  memset(&cb, 0, sizeof(cb));
+  cb.open  = rotate_open;
+  cb.close = rotate_close;
+  cb.prop  = _set_bootloader_props_rotate;
+
+  memset(&rotate, 0, sizeof(rotate));
+  cb.extra = &rotate;
 
   fdt_scan(fdt, &cb);
 }
